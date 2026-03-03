@@ -239,6 +239,8 @@
             max-width: 400px;
             position: relative;
             animation: fadeIn 0.3s;
+            max-height: 90vh; /* Para rolar se for longo */
+            overflow-y: auto;
         }
 
         .close-modal {
@@ -556,7 +558,9 @@
             </div>
         </section>
 
-    </div> <button onclick="abrirCheckout()" class="btn-flutuante">
+    </div> 
+
+    <button onclick="abrirCheckout()" class="btn-flutuante">
         🛒 Finalizar Pedido (<span id="btn-total">R$ 0,00</span>)
     </button>
 
@@ -568,6 +572,11 @@
             <div class="form-group">
                 <label>Nome:</label>
                 <input type="text" id="cli-nome" placeholder="Como podemos te chamar?">
+            </div>
+
+            <div class="form-group">
+                <label>WhatsApp (com DDD):</label>
+                <input type="tel" id="cli-whatsapp" placeholder="Ex: 27999999999">
             </div>
 
             <div class="form-group">
@@ -594,7 +603,7 @@
             </div>
 
             <button onclick="enviarParaWhatsapp()" class="btn-enviar-whats">
-                Enviar para o WhatsApp
+                Confirmar Pedido
             </button>
         </div>
     </div>
@@ -629,18 +638,16 @@
                 total += qtd * preco;
             });
             document.getElementById('btn-total').innerText = "R$ " + total.toFixed(2).replace('.', ',');
-            return total; // Retorna o valor para ser usado em outras funções
+            return total;
         }
 
-        // ----- FUNÇÕES DO CHECKOUT (MODAL) -----
-        
+        // Modal
         function abrirCheckout() {
             let total = atualizarTotalBotao();
             if (total === 0) {
                 alert("Seu carrinho está vazio! Adicione pelo menos um lanche antes de finalizar.");
                 return;
             }
-            // Mostra o Modal
             document.getElementById('modal-checkout').style.display = 'flex';
         }
 
@@ -648,7 +655,6 @@
             document.getElementById('modal-checkout').style.display = 'none';
         }
 
-        // Se clicar fora do modal, ele fecha
         window.onclick = function(event) {
             let modal = document.getElementById('modal-checkout');
             if (event.target == modal) {
@@ -659,19 +665,22 @@
         function verificarPagamento() {
             let pagamento = document.getElementById('cli-pagamento').value;
             let divTroco = document.getElementById('div-troco');
-            
-            if (pagamento === 'Dinheiro') {
-                divTroco.style.display = 'block';
-            } else {
-                divTroco.style.display = 'none';
-            }
+            divTroco.style.display = pagamento === 'Dinheiro' ? 'block' : 'none';
         }
 
+        // FUNÇÃO ATUALIZADA: Salva no localStorage e envia pro Whats
         function enviarParaWhatsapp() {
             let nome = document.getElementById('cli-nome').value.trim();
+            let whatsapp = document.getElementById('cli-whatsapp').value.trim();
             let endereco = document.getElementById('cli-endereco').value.trim();
             let pagamento = document.getElementById('cli-pagamento').value;
             let troco = document.getElementById('cli-troco').value.trim();
+
+            if(whatsapp === "") {
+                alert("Por favor, preencha o seu número de WhatsApp!");
+                document.getElementById('cli-whatsapp').focus();
+                return;
+            }
 
             if(endereco === "") {
                 alert("Por favor, preencha o endereço de entrega!");
@@ -680,6 +689,7 @@
             }
 
             let total = 0;
+            let itensLista = []; // Array para salvar no painel
             let textoPedido = "🍔 *NOVO PEDIDO - A LOJA BURGUER* 🍔\n\n";
             textoPedido += "*🛒 ITENS DO PEDIDO:*\n";
 
@@ -690,6 +700,8 @@
                     let preco = parseFloat(span.getAttribute('data-price'));
                     let subtotal = qtd * preco;
                     total += subtotal;
+                    
+                    itensLista.push({ nome: itemName, qtd: qtd, preco: preco });
                     textoPedido += `${qtd}x ${itemName} - R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
                 }
             });
@@ -699,6 +711,7 @@
             
             textoPedido += `\n\n*📍 DADOS DO CLIENTE:*`;
             if (nome !== "") textoPedido += `\n👤 Nome: ${nome}`;
+            textoPedido += `\n📱 WhatsApp: ${whatsapp}`;
             textoPedido += `\n🏠 Endereço: ${endereco}`;
             textoPedido += `\n💳 Pagamento: ${pagamento}`;
             
@@ -706,15 +719,35 @@
                 textoPedido += `\n💵 Troco para: ${troco}`;
             }
 
-            // O seu número de WhatsApp com DDD
-            let numeroWhatsapp = "5573998353325";
-            
-            // Transforma o texto para um formato de URL (troca espaços, quebras de linha, etc)
+            // 1. SALVANDO NO LOCALSTORAGE PARA O PAINEL LER
+            let pedidoId = "#" + Math.floor(1000 + Math.random() * 9000); // Gera um ID aleatório (ex: #4592)
+            let novoPedido = {
+                id: pedidoId,
+                data: new Date().toISOString(),
+                cliente: nome || "Cliente não identificado",
+                telefone: whatsapp,
+                endereco: endereco,
+                itens: itensLista,
+                total: total,
+                pagamento: pagamento,
+                status: "Pendente"
+            };
+
+            let pedidosSalvos = JSON.parse(localStorage.getItem('pedidosLoja') || '[]');
+            pedidosSalvos.push(novoPedido);
+            localStorage.setItem('pedidosLoja', JSON.stringify(pedidosSalvos));
+
+            // 2. ENVIANDO PARA O WHATSAPP DA LOJA
+            let numeroWhatsappLoja = "557398118727"; // O seu número configurado
             let textoCodificado = encodeURIComponent(textoPedido);
+            let url = `https://wa.me/${numeroWhatsappLoja}?text=${textoCodificado}`;
             
-            let url = `https://wa.me/${numeroWhatsapp}?text=${textoCodificado}`;
             window.open(url, '_blank');
             fecharModal();
+            
+            // Limpa o carrinho após finalizar
+            document.querySelectorAll('.qty-value').forEach(span => span.innerText = '0');
+            atualizarTotalBotao();
         }
     </script>
 </body>
