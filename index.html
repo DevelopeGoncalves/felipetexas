@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Loja Burguer - Delivery</title>
+    <style>
+        :root {
+            --primary-color: #f39c12;
+            --bg-color: #121212;
+            --bg-card: #1e1e1e;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            padding-bottom: 90px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ESTILO DAS ABAS */
+        .tabs-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            scrollbar-width: none; 
+        }
+        .tabs-container::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 2px solid #333;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ESTILO DOS ITENS */
+        .menu-item {
+            margin-bottom: 15px;
+            background-color: var(--bg-card);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #fff;
+        }
+
+        .item-price {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .item-desc {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        /* ESTILO DOS BOTÕES DE QUANTIDADE (+ E -) */
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+            border-top: 1px dashed #333;
+            padding-top: 10px;
+        }
+
+        .qty-btn {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .qty-btn:active {
+            transform: scale(0.9);
+            background-color: var(--primary-color);
+            color: #000;
+        }
+
+        .qty-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr 1fr; }
+        }
+
+        .simple-list {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding: 15px 0;
+        }
+        
+        .simple-list:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .simple-list .info { display: flex; flex-direction: column; }
+
+        /* BOTÃO DO WHATSAPP (FLUTUANTE) */
+        .btn-flutuante {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background-color: #25D366;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .btn-flutuante:hover { background-color: #1ebe57; }
+
+        /* MODAL DE CHECKOUT */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        .close-modal {
+            color: var(--text-muted);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+
+        .close-modal:hover { color: #fff; }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background-color: #121212;
+            color: #fff;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-group textarea { resize: vertical; }
+
+        .aviso-taxa {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--primary-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px dashed var(--primary-color);
+        }
+
+        .btn-enviar-whats {
+            width: 100%;
+            background-color: #25D366;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-enviar-whats:hover { background-color: #1ebe57; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="A Loja Burguer Logo" class="logo">
+            <h1>Cardápio Digital</h1>
+        </header>
+
+        <nav class="tabs-container">
+            <button class="tab-btn active" onclick="mudarAba('artesanal')">Artesanais</button>
+            <button class="tab-btn" onclick="mudarAba('tradicional')">Tradicionais</button>
+            <button class="tab-btn" onclick="mudarAba('batatas')">Batatas Fritas</button>
+            <button class="tab-btn" onclick="mudarAba('adicionais')">Adicionais</button>
+            <button class="tab-btn" onclick="mudarAba('bebidas')">Bebidas</button>
+        </nav>
+
+        <section id="artesanal" class="tab-content active">
+            <div class="grid-2">
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Banana Burguer</span><span class="item-price">R$ 23,99</span></div>
+                        <div class="item-desc">Pão, carne artesanal 120g, carne seca desfiada, salada, tomate, banana, queijo.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Banana Burguer" data-price="23.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Cheddar Bacon</span><span class="item-price">R$ 24,99</span></div>
+                        <div class="item-desc">Pão, carne artesanal 200g, queijo cheddar, bacon.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Cheddar Bacon" data-price="24.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Triplo X</span><span class="item-price">R$ 28,99</span></div>
+                        <div class="item-desc">Pão, 3 carnes artesanais 120g, queijo cheddar, bacon gratinado, salada.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Triplo X" data-price="28.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Angus</span><span class="item-price">R$ 23,99</span></div>
+                        <div class="item-desc">Pão, 200g de carne seca, queijo cheddar, salada, bacon caramelizado, molho barbecue.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Angus" data-price="23.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Costela Bacon</span><span class="item-price">R$ 24,99</span></div>
+                        <div class="item-desc">Pão, carne artesanal 120g, salada, costela desfiada, bacon, molho barbecue.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Costela Bacon" data-price="24.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Tropical Burguer</span><span class="item-price">R$ 24,99</span></div>
+                        <div class="item-desc">Pão brioche selado na chapa, salada, 150g de hambúrguer bovino, queijo, bacon fatiado, abacaxi selado com melaço.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Tropical Burguer" data-price="24.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Cheese Bacon</span><span class="item-price">R$ 22,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, alface, 200g de hambúrguer bovino, cream cheese, bacon fatiado, barbecue.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Cheese Bacon" data-price="22.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Cheddar Burguer</span><span class="item-price">R$ 22,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, salada, cebola roxa, 120g de hambúrguer bovino, cheddar, barbecue.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Cheddar Burguer" data-price="22.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Especial Burguer</span><span class="item-price">R$ 22,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, salada, 150g hambúrguer bovino, picles, bacon fatiado, cebola roxa, cream cheese.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Especial Burguer" data-price="22.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Intenso Burguer</span><span class="item-price">R$ 21,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, 130g de hambúrguer bovino, queijo mussarela, bacon em fatias, salada especial.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Intenso Burguer" data-price="21.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Onion Rings</span><span class="item-price">R$ 22,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, salada, 100g de hambúrguer bovino, molho especial da casa, cheddar, 2 fatias de bacon gratinadas, cebola empanada.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Onion Rings" data-price="22.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Bacon Crock</span><span class="item-price">R$ 22,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, 120g de hambúrguer bovino, molho da casa, salada, queijo mussarela, bacon fatiado, maionese de bacon.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Bacon Crock" data-price="22.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Coalho Burguer</span><span class="item-price">R$ 23,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, salada, 100g de hambúrguer bovino, queijo coalho, banana da terra, melaço, mussarela.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Coalho Burguer" data-price="23.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Moda da Casa</span><span class="item-price">R$ 23,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, cream cheese, salada, hambúrguer 120g, queijo cheddar, cebola com bacon caramelizado.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Moda da Casa" data-price="23.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+
+                <div class="menu-item">
+                    <div>
+                        <div class="item-header"><span class="item-name">Snack Cheddar Duplo</span><span class="item-price">R$ 25,99</span></div>
+                        <div class="item-desc">Pão selado na chapa, salada, duplo hambúrguer smash 80g cada, cheddar, bacon, maionese de bacon.</div>
+                    </div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Snack Cheddar Duplo" data-price="25.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tradicional" class="tab-content">
+            <div class="grid-2">
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Tudo</span><span class="item-price">R$ 17,99</span></div><div class="item-desc">Pão, hambúrguer, ovo, bacon, queijo, presunto, frango, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Tudo" data-price="17.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Burguer</span><span class="item-price">R$ 17,99</span></div><div class="item-desc">Pão, hambúrguer, queijo, presunto, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Burguer" data-price="17.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Calabresa</span><span class="item-price">R$ 17,99</span></div><div class="item-desc">Pão, hambúrguer, queijo, calabresa, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Calabresa" data-price="17.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Egg Bacon</span><span class="item-price">R$ 16,99</span></div><div class="item-desc">Pão, hambúrguer, queijo, ovo, bacon, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Egg Bacon" data-price="16.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Frango</span><span class="item-price">R$ 15,99</span></div><div class="item-desc">Pão, frango, hambúrguer, queijo, ovo, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Frango" data-price="15.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Bacon</span><span class="item-price">R$ 14,99</span></div><div class="item-desc">Pão, hambúrguer, bacon, queijo, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Bacon" data-price="14.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Egg</span><span class="item-price">R$ 14,99</span></div><div class="item-desc">Pão, hambúrguer, queijo, ovo, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Egg" data-price="14.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">X-Salada</span><span class="item-price">R$ 12,99</span></div><div class="item-desc">Pão, hambúrguer, queijo, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="X-Salada" data-price="12.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">Hambúrguer</span><span class="item-price">R$ 11,99</span></div><div class="item-desc">Pão, hambúrguer, salada, tomate, milho, batata palha.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Hambúrguer" data-price="11.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+                <div class="menu-item">
+                    <div><div class="item-header"><span class="item-name">Misto Egg</span><span class="item-price">R$ 9,99</span></div><div class="item-desc">Pão, ovo, queijo, presunto.</div></div>
+                    <div class="qty-controls"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Misto Egg" data-price="9.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="batatas" class="tab-content">
+            <div class="grid-2">
+                <div class="menu-item">
+                    <div class="item-header"><span class="item-name">Tradicionais</span></div>
+                    <div class="simple-list"><div class="info"><span>P (120g)</span><span class="item-price">R$ 9,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Tradicional P" data-price="9.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>M (190g)</span><span class="item-price">R$ 15,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Tradicional M" data-price="15.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>G (300g)</span><span class="item-price">R$ 17,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Tradicional G" data-price="17.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-header"><span class="item-name">Cheddar e Bacon</span></div>
+                    <div class="simple-list"><div class="info"><span>P (120g)</span><span class="item-price">R$ 17,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Cheddar/Bacon P" data-price="17.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>M (190g)</span><span class="item-price">R$ 23,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Cheddar/Bacon M" data-price="23.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>G (300g)</span><span class="item-price">R$ 28,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Cheddar/Bacon G" data-price="28.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-header"><span class="item-name">Queijo Mussarela e Farofa de Bacon</span></div>
+                    <div class="simple-list"><div class="info"><span>P (120g)</span><span class="item-price">R$ 16,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Mussarela/Farofa P" data-price="16.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>M (190g)</span><span class="item-price">R$ 19,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Mussarela/Farofa M" data-price="19.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>G (300g)</span><span class="item-price">R$ 24,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Mussarela/Farofa G" data-price="24.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="item-header"><span class="item-name">Costela Desfiada e Cheddar</span></div>
+                    <div class="simple-list"><div class="info"><span>P (120g)</span><span class="item-price">R$ 20,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Costela/Cheddar P" data-price="20.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>M (190g)</span><span class="item-price">R$ 24,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Costela/Cheddar M" data-price="24.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                    <div class="simple-list"><div class="info"><span>G (300g)</span><span class="item-price">R$ 29,99</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Batata Costela/Cheddar G" data-price="29.99">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="adicionais" class="tab-content">
+            <div class="menu-item">
+                <div class="simple-list"><div class="info"><span>120g de carne de costela</span><span class="item-price">R$ 6,50</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Carne Costela" data-price="6.50">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Carne artesanal de 100g</span><span class="item-price">R$ 5,50</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Carne Artesanal" data-price="5.50">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Cheddar Extra</span><span class="item-price">R$ 5,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Cheddar" data-price="5.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>100g de Carne Seca</span><span class="item-price">R$ 5,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Carne Seca" data-price="5.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Carne tradicional</span><span class="item-price">R$ 4,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Carne Tradicional" data-price="4.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Queijo</span><span class="item-price">R$ 3,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Queijo" data-price="3.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Bacon</span><span class="item-price">R$ 3,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Bacon" data-price="3.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Calabresa</span><span class="item-price">R$ 3,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Calabresa" data-price="3.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Frango</span><span class="item-price">R$ 3,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Frango" data-price="3.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Banana</span><span class="item-price">R$ 2,50</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Banana" data-price="2.50">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Presunto</span><span class="item-price">R$ 2,50</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Presunto" data-price="2.50">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Ovo</span><span class="item-price">R$ 2,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Ovo" data-price="2.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Maionese caseira</span><span class="item-price">R$ 1,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Adicional Maionese" data-price="1.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+            </div>
+        </section>
+
+        <section id="bebidas" class="tab-content">
+            <div class="menu-item">
+                <div class="simple-list"><div class="info"><span>Guaraná Lata</span><span class="item-price">R$ 5,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Guaraná Lata" data-price="5.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Pepsi Lata</span><span class="item-price">R$ 5,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Pepsi Lata" data-price="5.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Coca-Cola Lata</span><span class="item-price">R$ 6,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Coca-Cola Lata" data-price="6.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Guaraná 1L</span><span class="item-price">R$ 9,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Guaraná 1L" data-price="9.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Pepsi 1L</span><span class="item-price">R$ 9,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Pepsi 1L" data-price="9.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Guaraná 2L</span><span class="item-price">R$ 12,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Guaraná 2L" data-price="12.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Pepsi 2L</span><span class="item-price">R$ 12,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Pepsi 2L" data-price="12.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Coca-Cola 2L</span><span class="item-price">R$ 13,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Coca-Cola 2L" data-price="13.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Suco 500ml</span><span class="item-price">R$ 6,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Suco 500ml" data-price="6.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+                <div class="simple-list"><div class="info"><span>Suco 1L</span><span class="item-price">R$ 12,00</span></div><div class="qty-controls" style="border:none; padding:0; gap:10px;"><button class="qty-btn" onclick="alterarQtd(this, -1)">-</button><span class="qty-value" data-name="Suco 1L" data-price="12.00">0</span><button class="qty-btn" onclick="alterarQtd(this, 1)">+</button></div></div>
+            </div>
+        </section>
+
+    </div> <button onclick="abrirCheckout()" class="btn-flutuante">
+        🛒 Finalizar Pedido (<span id="btn-total">R$ 0,00</span>)
+    </button>
+
+    <div id="modal-checkout" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="fecharModal()">&times;</span>
+            <h2>Falta pouco! 🛵</h2>
+            
+            <div class="form-group">
+                <label>Nome:</label>
+                <input type="text" id="cli-nome" placeholder="Como podemos te chamar?">
+            </div>
+
+            <div class="form-group">
+                <label>Endereço de Entrega:</label>
+                <textarea id="cli-endereco" rows="3" placeholder="Rua, Número, Bairro, Ponto de Referência"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Forma de Pagamento:</label>
+                <select id="cli-pagamento" onchange="verificarPagamento()">
+                    <option value="Pix">Pix</option>
+                    <option value="Cartão">Cartão (Crédito ou Débito)</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="div-troco" style="display: none;">
+                <label>Precisa de troco para quanto?</label>
+                <input type="text" id="cli-troco" placeholder="Ex: Para R$ 50,00 ou 'Não preciso'">
+            </div>
+
+            <div class="aviso-taxa">
+                ⚠️ O valor da <strong>taxa de entrega</strong> será confirmado no WhatsApp com base no seu endereço.
+            </div>
+
+            <button onclick="enviarParaWhatsapp()" class="btn-enviar-whats">
+                Enviar para o WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Função de abas
+        function mudarAba(idAba) {
+            document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(idAba).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Botões de + e -
+        function alterarQtd(botao, mudanca) {
+            let spanValor = botao.parentElement.querySelector('.qty-value');
+            let qtdAtual = parseInt(spanValor.innerText);
+            let novaQtd = qtdAtual + mudanca;
+            
+            if (novaQtd >= 0) {
+                spanValor.innerText = novaQtd;
+                atualizarTotalBotao();
+            }
+        }
+
+        // Atualiza valor do botão flutuante
+        function atualizarTotalBotao() {
+            let total = 0;
+            document.querySelectorAll('.qty-value').forEach(span => {
+                let qtd = parseInt(span.innerText);
+                let preco = parseFloat(span.getAttribute('data-price'));
+                total += qtd * preco;
+            });
+            document.getElementById('btn-total').innerText = "R$ " + total.toFixed(2).replace('.', ',');
+            return total; // Retorna o valor para ser usado em outras funções
+        }
+
+        // ----- FUNÇÕES DO CHECKOUT (MODAL) -----
+        
+        function abrirCheckout() {
+            let total = atualizarTotalBotao();
+            if (total === 0) {
+                alert("Seu carrinho está vazio! Adicione pelo menos um lanche antes de finalizar.");
+                return;
+            }
+            // Mostra o Modal
+            document.getElementById('modal-checkout').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-checkout').style.display = 'none';
+        }
+
+        // Se clicar fora do modal, ele fecha
+        window.onclick = function(event) {
+            let modal = document.getElementById('modal-checkout');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function verificarPagamento() {
+            let pagamento = document.getElementById('cli-pagamento').value;
+            let divTroco = document.getElementById('div-troco');
+            
+            if (pagamento === 'Dinheiro') {
+                divTroco.style.display = 'block';
+            } else {
+                divTroco.style.display = 'none';
+            }
+        }
+
+        function enviarParaWhatsapp() {
+            let nome = document.getElementById('cli-nome').value.trim();
+            let endereco = document.getElementById('cli-endereco').value.trim();
+            let pagamento = document.getElementById('cli-pagamento').value;
+            let troco = document.getElementById('cli-troco').value.trim();
+
+            if(endereco === "") {
+                alert("Por favor, preencha o endereço de entrega!");
+                document.getElementById('cli-endereco').focus();
+                return;
+            }
+
+            let total = 0;
+            let textoPedido = "🍔 *NOVO PEDIDO - A LOJA BURGUER* 🍔\n\n";
+            textoPedido += "*🛒 ITENS DO PEDIDO:*\n";
+
+            document.querySelectorAll('.qty-value').forEach(span => {
+                let qtd = parseInt(span.innerText);
+                if (qtd > 0) {
+                    let itemName = span.getAttribute('data-name');
+                    let preco = parseFloat(span.getAttribute('data-price'));
+                    let subtotal = qtd * preco;
+                    total += subtotal;
+                    textoPedido += `${qtd}x ${itemName} - R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+                }
+            });
+
+            textoPedido += `\n💰 *SUBTOTAL: R$ ${total.toFixed(2).replace('.', ',')}*`;
+            textoPedido += `\n🛵 *TAXA DE ENTREGA:* A confirmar`;
+            
+            textoPedido += `\n\n*📍 DADOS DO CLIENTE:*`;
+            if (nome !== "") textoPedido += `\n👤 Nome: ${nome}`;
+            textoPedido += `\n🏠 Endereço: ${endereco}`;
+            textoPedido += `\n💳 Pagamento: ${pagamento}`;
+            
+            if (pagamento === 'Dinheiro' && troco !== "") {
+                textoPedido += `\n💵 Troco para: ${troco}`;
+            }
+
+            // O seu número de WhatsApp com DDD
+            let numeroWhatsapp = "5573998353325";
+            
+            // Transforma o texto para um formato de URL (troca espaços, quebras de linha, etc)
+            let textoCodificado = encodeURIComponent(textoPedido);
+            
+            let url = `https://wa.me/${numeroWhatsapp}?text=${textoCodificado}`;
+            window.open(url, '_blank');
+            fecharModal();
+        }
+    </script>
+</body>
+</html>

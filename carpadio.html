@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d0d0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>A Loja Burguer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --dark: #0d0d0d;
+  --dark2: #141414;
+  --dark3: #1c1c1c;
+  --dark4: #242424;
+  --dark5: #2c2c2c;
+  --white: #f0ebe0;
+  --gray: #777;
+  --green: #25D366;
+  --green2: #1eb854;
+  --red: #e63946;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--dark); color: var(--white);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh; overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+header {
+  background: var(--dark2); border-bottom: 2px solid var(--gold);
+  position: sticky; top: 0; z-index: 100;
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 60px;
+}
+.logo-wrap { display: flex; align-items: center; gap: 10px; }
+.logo-dia {
+  width: 42px; height: 42px; border: 2px solid var(--gold);
+  transform: rotate(45deg); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; background: var(--dark);
+}
+.logo-dia span {
+  transform: rotate(-45deg); font-family: 'Bebas Neue', sans-serif;
+  font-size: 9px; color: var(--gold); text-align: center; line-height: 1.2;
+}
+.brand { line-height: 1; }
+.brand b { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--white); letter-spacing: 2px; }
+.brand small { font-family: 'Oswald', sans-serif; font-size: 10px; color: var(--gold); letter-spacing: 4px; font-weight: 300; }
+.cart-pill {
+  background: var(--gold); color: var(--dark); border: none; border-radius: 50px;
+  padding: 10px 16px; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  white-space: nowrap; min-height: 44px; transition: background 0.2s;
+}
+.cart-pill:active { background: var(--gold-light); }
+.badge {
+  background: var(--red); color: #fff; border-radius: 50%;
+  width: 22px; height: 22px; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero {
+  background: linear-gradient(160deg, #0d0d0d 0%, #1a1200 50%, #0d0d0d 100%);
+  padding: 28px 20px 22px; text-align: center; position: relative; overflow: hidden;
+  border-bottom: 1px solid #222;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.1) 0%, transparent 65%);
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 15vw, 72px);
+  color: var(--gold); letter-spacing: 3px; line-height: 0.9; position: relative;
+}
+.hero h1 span { color: var(--white); }
+.hero-sub { font-size: 12px; color: var(--gray); margin-top: 10px; position: relative; line-height: 1.6; }
+.hero-sub strong { color: var(--gold-light); }
+.open-dot {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.3);
+  border-radius: 20px; padding: 5px 14px; font-size: 12px; color: #4ade80;
+  margin-top: 10px; font-family: 'Oswald', sans-serif; letter-spacing: 1px; position: relative;
+}
+.open-dot::before { content: ''; width: 7px; height: 7px; background: #4ade80; border-radius: 50%; animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.tabs {
+  background: var(--dark2); border-bottom: 1px solid #222;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  position: sticky; top: 60px; z-index: 90;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tabs-inner { display: flex; padding: 0 12px; min-width: max-content; }
+.tab {
+  background: none; border: none; color: var(--gray); font-family: 'Oswald', sans-serif;
+  font-size: 13px; letter-spacing: 1.5px; padding: 14px 14px; cursor: pointer;
+  border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap;
+  text-transform: uppercase; min-height: 48px;
+}
+.tab.on { color: var(--gold); border-bottom-color: var(--gold); }
+.tab:active { color: var(--gold-light); }
+main { padding-bottom: 100px; }
+.sec { display: none; padding: 20px 14px; }
+.sec.on { display: block; }
+.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--gold); letter-spacing: 3px; margin-bottom: 3px; }
+.sec-sub { font-size: 12px; color: var(--gray); margin-bottom: 18px; }
+.grid { display: flex; flex-direction: column; gap: 10px; }
+.card {
+  background: var(--dark3); border: 1px solid #282828; border-radius: 14px; padding: 14px;
+  display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;
+}
+.card:active { border-color: var(--gold); background: var(--dark4); }
+.card-name { font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 600; color: var(--white); }
+.card-desc { font-size: 12px; color: var(--gray); line-height: 1.5; flex: 1; }
+.card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.card-price { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--gold); }
+.btn-add {
+  background: var(--gold); color: var(--dark); border: none; border-radius: 10px;
+  width: 44px; height: 44px; font-size: 26px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.btn-add:active { background: var(--gold-light); transform: scale(0.93); }
+.sub-label {
+  font-family: 'Oswald', sans-serif; font-size: 12px; color: var(--gray);
+  letter-spacing: 2px; text-transform: uppercase; margin: 20px 0 10px;
+  padding-bottom: 8px; border-bottom: 1px solid #242424;
+}
+.bat-group { background: var(--dark3); border: 1px solid #282828; border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
+.bat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-top: 1px solid #222; gap: 8px;
+}
+.bat-sz { font-size: 14px; color: var(--white); font-weight: 600; }
+.bat-sz small { color: var(--gray); font-size: 11px; display: block; font-weight: 400; }
+.bat-right { display: flex; align-items: center; gap: 12px; }
+.bat-price { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); }
+.drink-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.drink-card {
+  background: var(--dark3); border: 1px solid #282828; border-radius: 14px; padding: 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+}
+.drink-card:active { border-color: var(--gold); }
+.drink-icon { font-size: 28px; margin-bottom: 2px; }
+.drink-name { font-size: 13px; color: var(--white); font-weight: 700; line-height: 1.3; }
+.drink-price { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); margin: 4px 0; }
+.btn-drink {
+  width: 100%; background: var(--gold); color: var(--dark); border: none; border-radius: 8px;
+  padding: 9px; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; min-height: 40px;
+}
+.btn-drink:active { background: var(--gold-light); }
+.add-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.add-card {
+  background: var(--dark3); border: 1px solid #282828; border-radius: 12px; padding: 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.add-card:active { border-color: rgba(201,168,76,0.5); }
+.add-name { font-size: 12px; color: var(--white); font-weight: 700; line-height: 1.3; }
+.add-price { font-size: 13px; color: var(--gold); font-family: 'Oswald', sans-serif; white-space: nowrap; margin-top: 2px; }
+.btn-plus {
+  background: transparent; border: 1.5px solid var(--gold); color: var(--gold); border-radius: 8px;
+  width: 36px; height: 36px; font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;
+}
+.btn-plus:active { background: var(--gold); color: var(--dark); }
+.float-cart { display: none; position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; right: 16px; z-index: 150; animation: supin 0.3s ease; }
+.float-cart.show { display: block; }
+@keyframes supin { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.float-btn {
+  width: 100%; background: var(--gold); color: var(--dark); border: none; border-radius: 16px;
+  padding: 16px 24px; font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700;
+  letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 8px 32px rgba(201,168,76,0.45); min-height: 56px;
+}
+.float-btn:active { background: var(--gold-light); transform: scale(0.99); }
+.float-left { display: flex; align-items: center; gap: 10px; }
+.float-count {
+  background: var(--dark); border-radius: 50%; width: 28px; height: 28px;
+  font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: var(--gold);
+}
+.float-total { font-size: 18px; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; backdrop-filter: blur(4px); }
+.overlay.show { display: block; }
+.drawer {
+  position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark2);
+  border-top: 2px solid var(--gold); border-radius: 22px 22px 0 0;
+  z-index: 201; max-height: 92vh; display: flex; flex-direction: column;
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.drawer.show { transform: translateY(0); }
+.drawer-handle { width: 40px; height: 4px; background: #444; border-radius: 4px; margin: 10px auto 0; }
+.drawer-head {
+  padding: 12px 20px 14px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid #242424; flex-shrink: 0;
+}
+.drawer-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--gold); letter-spacing: 2px; }
+.btn-close {
+  background: var(--dark5); border: 1px solid #333; color: var(--white);
+  width: 40px; height: 40px; border-radius: 50%; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.btn-close:active { background: #333; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 14px 18px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.drawer-body::-webkit-scrollbar { display: none; }
+.empty-cart { text-align: center; padding: 40px 20px; color: var(--gray); }
+.empty-icon { font-size: 52px; margin-bottom: 12px; }
+.ci { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid #202020; align-items: center; }
+.ci:last-child { border-bottom: none; }
+.ci-info { flex: 1; }
+.ci-name { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+.ci-price { font-size: 14px; color: var(--gold); font-family: 'Oswald', sans-serif; }
+.qty-ctrl { display: flex; align-items: center; gap: 2px; background: var(--dark5); border-radius: 10px; padding: 3px; }
+.qty-b {
+  background: none; border: none; color: var(--gold); width: 34px; height: 34px; font-size: 20px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; font-family: 'Oswald', sans-serif; font-weight: 700;
+}
+.qty-b:active { background: rgba(201,168,76,0.15); }
+.qty-n { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--white); min-width: 28px; text-align: center; }
+.drawer-foot { padding: 14px 18px; border-top: 1px solid #222; flex-shrink: 0; background: var(--dark2); }
+.drawer-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.drawer-total-lbl { font-family: 'Oswald', sans-serif; font-size: 13px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; }
+.drawer-total-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); }
+.btn-checkout {
+  width: 100%; background: var(--green); color: white; border: none; border-radius: 14px;
+  padding: 16px; font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700;
+  letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px;
+}
+.btn-checkout:active { background: var(--green2); }
+/* ADDRESS MODAL */
+.addr-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 300; backdrop-filter: blur(6px); align-items: flex-end; justify-content: center;
+}
+.addr-overlay.show { display: flex; }
+.addr-modal {
+  background: var(--dark2); border-top: 2px solid var(--gold); border-radius: 22px 22px 0 0;
+  width: 100%; padding: 0 0 calc(16px + env(safe-area-inset-bottom));
+  animation: upIn 0.35s cubic-bezier(0.4,0,0.2,1); max-height: 95vh; overflow-y: auto;
+}
+@keyframes upIn { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.addr-handle { width: 40px; height: 4px; background: #444; border-radius: 4px; margin: 10px auto 0; }
+.addr-head {
+  padding: 14px 20px 16px; border-bottom: 1px solid #242424;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.addr-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--gold); letter-spacing: 2px; }
+.addr-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.order-sum { background: var(--dark3); border-radius: 12px; padding: 14px; border: 1px solid #282828; }
+.order-sum-title { font-family: 'Oswald', sans-serif; font-size: 11px; color: var(--gray); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.order-sum-item { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: var(--white); }
+.order-sum-item span:last-child { color: var(--gold); font-family: 'Oswald', sans-serif; }
+.order-sum-total { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; }
+.order-sum-total b { font-family: 'Oswald', sans-serif; font-size: 13px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; }
+.order-sum-total strong { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--gold); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-family: 'Oswald', sans-serif; font-size: 11px; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; }
+.field input, .field textarea {
+  background: var(--dark4); border: 1.5px solid #333; border-radius: 10px;
+  color: var(--white); font-family: 'Nunito', sans-serif; font-size: 16px;
+  padding: 13px 14px; outline: none; transition: border-color 0.2s; width: 100%; -webkit-appearance: none;
+}
+.field input:focus, .field textarea:focus { border-color: var(--gold); }
+.field textarea { resize: none; height: 70px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tipo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tipo-opt {
+  background: var(--dark4); border: 1.5px solid #333; border-radius: 10px; padding: 13px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  font-family: 'Oswald', sans-serif; font-size: 14px; color: var(--gray); font-weight: 600; min-height: 48px;
+}
+.tipo-opt.sel { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+.pgto-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pgto-opt {
+  background: var(--dark4); border: 1.5px solid #333; border-radius: 10px; padding: 12px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer;
+  font-family: 'Oswald', sans-serif; font-size: 12px; color: var(--gray); font-weight: 600; text-align: center; min-height: 64px;
+}
+.pgto-opt span:first-child { font-size: 22px; }
+.pgto-opt.sel { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+.troco-wrap { display: none; }
+.troco-wrap.show { display: block; }
+.field-retirada { display: none; }
+.field-retirada.show { display: flex; }
+.retirada-box {
+  background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 10px; padding: 14px; font-size: 13px; color: var(--gold-light); line-height: 1.6; width: 100%;
+}
+.btn-send {
+  width: 100%; background: var(--green); color: white; border: none; border-radius: 14px;
+  padding: 18px; font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 700;
+  letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 58px; margin-top: 4px;
+}
+.btn-send:active { background: var(--green2); transform: scale(0.99); }
+.footer { background: var(--dark2); border-top: 1px solid #222; padding: 28px 20px; text-align: center; }
+.footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--gold); letter-spacing: 3px; }
+.footer-logo span { color: var(--white); }
+.footer-addr { font-size: 13px; color: var(--gray); margin-top: 8px; line-height: 1.7; }
+.footer-addr strong { color: var(--gold-light); }
+.toast {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  background: var(--dark3); border: 1px solid var(--gold); border-left: 4px solid var(--gold);
+  color: var(--white); padding: 11px 18px; border-radius: 10px;
+  font-size: 13px; font-family: 'Oswald', sans-serif; z-index: 500;
+  white-space: nowrap; animation: toastIn 0.25s ease; pointer-events: none;
+}
+@keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-dia"><span>A<br>LOJA</span></div>
+    <div class="brand"><b>A Loja</b><small>Burguer</small></div>
+  </div>
+  <button class="cart-pill" onclick="openCart()">
+    🛒 Carrinho <span class="badge" id="hBadge">0</span>
+  </button>
+</header>
+
+<div class="hero">
+  <h1><span>A </span>Loja<br><span>Burguer</span></h1>
+  <p class="hero-sub">📍 Rua João Amaro Gomes, Nº 1332 · Tancredo Neves<br><strong>📱 73 99835-3325</strong></p>
+  <div class="open-dot">Aceitando pedidos</div>
+</div>
+
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button class="tab on" onclick="goTab('art',this)">🍔 Artesanal</button>
+    <button class="tab" onclick="goTab('trad',this)">🥪 Tradicional</button>
+    <button class="tab" onclick="goTab('bat',this)">🍟 Batatas</button>
+    <button class="tab" onclick="goTab('beb',this)">🥤 Bebidas</button>
+    <button class="tab" onclick="goTab('adic',this)">➕ Adicionais</button>
+  </div>
+</nav>
+
+<main>
+<section id="art" class="sec on">
+  <div class="sec-title">Artesanal</div>
+  <div class="sec-sub">Carnes artesanais grelhadas na brasa</div>
+  <div class="grid" id="g-art"></div>
+</section>
+
+<section id="trad" class="sec">
+  <div class="sec-title">Tradicional</div>
+  <div class="sec-sub">Os clássicos que todo mundo ama</div>
+  <div class="grid" id="g-trad"></div>
+</section>
+
+<section id="bat" class="sec">
+  <div class="sec-title">Batatas</div>
+  <div class="sec-sub">Fritas crocantes e recheadas</div>
+  <div class="sub-label">Batata Frita Tradicional</div>
+  <div class="bat-group">
+    <div class="bat-row"><div class="bat-sz">P <small>120g</small></div><div class="bat-right"><span class="bat-price">R$ 9,99</span><button class="btn-add" onclick="add('Batata Frita P 120g',9.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">M <small>190g</small></div><div class="bat-right"><span class="bat-price">R$ 15,99</span><button class="btn-add" onclick="add('Batata Frita M 190g',15.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">G <small>300g</small></div><div class="bat-right"><span class="bat-price">R$ 17,99</span><button class="btn-add" onclick="add('Batata Frita G 300g',17.99)">+</button></div></div>
+  </div>
+  <div class="sub-label">Recheada — Cheddar e Bacon</div>
+  <div class="bat-group">
+    <div class="bat-row"><div class="bat-sz">P <small>120g</small></div><div class="bat-right"><span class="bat-price">R$ 17,99</span><button class="btn-add" onclick="add('Batata Cheddar/Bacon P',17.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">M <small>190g</small></div><div class="bat-right"><span class="bat-price">R$ 23,99</span><button class="btn-add" onclick="add('Batata Cheddar/Bacon M',23.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">G <small>300g</small></div><div class="bat-right"><span class="bat-price">R$ 28,99</span><button class="btn-add" onclick="add('Batata Cheddar/Bacon G',28.99)">+</button></div></div>
+  </div>
+  <div class="sub-label">Recheada — Mussarela e Farofa de Bacon</div>
+  <div class="bat-group">
+    <div class="bat-row"><div class="bat-sz">P <small>120g</small></div><div class="bat-right"><span class="bat-price">R$ 16,99</span><button class="btn-add" onclick="add('Batata Mussarela/Farofa P',16.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">M <small>190g</small></div><div class="bat-right"><span class="bat-price">R$ 19,99</span><button class="btn-add" onclick="add('Batata Mussarela/Farofa M',19.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">G <small>300g</small></div><div class="bat-right"><span class="bat-price">R$ 24,99</span><button class="btn-add" onclick="add('Batata Mussarela/Farofa G',24.99)">+</button></div></div>
+  </div>
+  <div class="sub-label">Recheada — Costela Desfiada e Cheddar</div>
+  <div class="bat-group">
+    <div class="bat-row"><div class="bat-sz">P <small>120g</small></div><div class="bat-right"><span class="bat-price">R$ 20,99</span><button class="btn-add" onclick="add('Batata Costela/Cheddar P',20.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">M <small>190g</small></div><div class="bat-right"><span class="bat-price">R$ 24,99</span><button class="btn-add" onclick="add('Batata Costela/Cheddar M',24.99)">+</button></div></div>
+    <div class="bat-row"><div class="bat-sz">G <small>300g</small></div><div class="bat-right"><span class="bat-price">R$ 29,99</span><button class="btn-add" onclick="add('Batata Costela/Cheddar G',29.99)">+</button></div></div>
+  </div>
+</section>
+
+<section id="beb" class="sec">
+  <div class="sec-title">Bebidas</div>
+  <div class="sec-sub">Geladas para acompanhar</div>
+  <div class="drink-grid" id="g-beb"></div>
+</section>
+
+<section id="adic" class="sec">
+  <div class="sec-title">Adicionais</div>
+  <div class="sec-sub">Deixe seu lanche do seu jeito</div>
+  <div class="add-grid" id="g-adic"></div>
+</section>
+
+<div class="footer">
+  <div class="footer-logo">A Loja <span>Burguer</span></div>
+  <div class="footer-addr">📍 Rua João Amaro Gomes, Nº 1332 · Tancredo Neves<br><strong>📱 73 99835-3325</strong></div>
+</div>
+</main>
+
+<!-- FLOATING CART -->
+<div class="float-cart" id="floatCart">
+  <button class="float-btn" onclick="openCart()">
+    <div class="float-left">
+      <span class="float-count" id="floatCount">0</span>
+      <span>Ver pedido</span>
+    </div>
+    <span class="float-total" id="floatVal">R$ 0,00</span>
+  </button>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="ov" onclick="closeCart()"></div>
+
+<!-- CART DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-head">
+    <span class="drawer-title">🛒 Meu Pedido</span>
+    <button class="btn-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-body" id="cartBody">
+    <div class="empty-cart">
+      <div class="empty-icon">🍔</div>
+      <p style="color:var(--gray);font-size:14px">Carrinho vazio.<br>Adicione um lanche!</p>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <div class="drawer-total">
+      <span class="drawer-total-lbl">Total</span>
+      <span class="drawer-total-val" id="dTotal">R$ 0,00</span>
+    </div>
+    <button class="btn-checkout" onclick="openAddr()">
+      📋 Informar Endereço e Finalizar
+    </button>
+  </div>
+</div>
+
+<!-- ADDRESS MODAL -->
+<div class="addr-overlay" id="addrOv">
+  <div class="addr-modal">
+    <div class="addr-handle"></div>
+    <div class="addr-head">
+      <span class="addr-title">📋 Finalizar Pedido</span>
+      <button class="btn-close" onclick="closeAddr()">✕</button>
+    </div>
+    <div class="addr-body">
+
+      <div class="order-sum">
+        <div class="order-sum-title">Resumo do pedido</div>
+        <div id="sumItems"></div>
+        <div class="order-sum-total">
+          <b>Total</b>
+          <strong id="sumTotal">R$ 0,00</strong>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Seu nome *</label>
+        <input type="text" id="fNome" placeholder="Ex: João Silva" autocomplete="name" inputmode="text">
+      </div>
+
+      <div class="field">
+        <label>Tipo de entrega *</label>
+        <div class="tipo-row">
+          <div class="tipo-opt sel" id="tDelivery" onclick="setTipo('delivery')">🛵 Delivery</div>
+          <div class="tipo-opt" id="tRetirada" onclick="setTipo('retirada')">🏠 Retirada</div>
+        </div>
+      </div>
+
+      <div id="fieldsDelivery">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="field">
+            <label>Rua / Avenida *</label>
+            <input type="text" id="fRua" placeholder="Ex: Rua das Flores" autocomplete="street-address">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Número *</label>
+              <input type="text" id="fNum" placeholder="Ex: 123" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label>Complemento</label>
+              <input type="text" id="fComp" placeholder="Apto, casa...">
+            </div>
+          </div>
+          <div class="field">
+            <label>Bairro *</label>
+            <input type="text" id="fBairro" placeholder="Ex: Tancredo Neves">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Cidade *</label>
+              <input type="text" id="fCidade" placeholder="Ex: Itabuna">
+            </div>
+            <div class="field">
+              <label>Referência</label>
+              <input type="text" id="fRef" placeholder="Perto de...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-retirada" id="fieldRetirada">
+        <div class="retirada-box">
+          📍 <strong>Retirar no local:</strong><br>
+          Rua João Amaro Gomes, Nº 1332<br>
+          Tancredo Neves · <strong>73 99835-3325</strong>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Pagamento *</label>
+        <div class="pgto-opts">
+          <div class="pgto-opt sel" id="pDinheiro" onclick="setPgto('dinheiro')"><span>💵</span><span>Dinheiro</span></div>
+          <div class="pgto-opt" id="pPix" onclick="setPgto('pix')"><span>📲</span><span>Pix</span></div>
+          <div class="pgto-opt" id="pCartao" onclick="setPgto('cartao')"><span>💳</span><span>Cartão</span></div>
+        </div>
+      </div>
+
+      <div class="troco-wrap" id="trocoWrap">
+        <div class="field">
+          <label>Troco para quanto?</label>
+          <input type="text" id="fTroco" placeholder="Ex: R$ 50,00" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Observações</label>
+        <textarea id="fObs" placeholder="Ex: sem cebola, portão azul, capricha no molho..."></textarea>
+      </div>
+
+      <button class="btn-send" onclick="sendWpp()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.558 4.14 1.535 5.876L.057 23.447c-.07.265.166.5.43.428l5.688-1.493A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-5.032-1.386l-.36-.214-3.736.98.998-3.645-.235-.374A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+        Enviar pelo WhatsApp
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const artesanal = [
+  {name:'Banana Burguer',price:23.99,desc:'Pão, carne artesanal 120g, carne seca desfiada, salada, tomate, banana, queijo'},
+  {name:'Angus',price:23.99,desc:'Pão, 200g de carne seca, queijo cheddar, salada, bacon caramelizado, molho barbecue'},
+  {name:'Chease Bacon',price:22.99,desc:'Pão selado na chapa, alface, 200g de hambúrguer bovino, creme chease, bacon fatiado, barbecue'},
+  {name:'Intenso Burguer',price:21.99,desc:'Pão selado na chapa, 130g de hambúrguer bovina, queijo mussarela, bacon em fatias, salada especial'},
+  {name:'Coalho Burguer',price:23.99,desc:'Pão selado da chapa, salada, 100g de hambúrguer bovino, queijo coalho, banana da terra, melaço, mussarela'},
+  {name:'Cheddar Bacon',price:24.99,desc:'Pão, carne artesanal 200g, queijo cheddar, bacon'},
+  {name:'Costela Bacon',price:24.99,desc:'Pão, carne artesanal 120g, salada, costela desfiada, bacon, molho barbecue'},
+  {name:'Cheddar Burguer',price:22.99,desc:'Pão selado na chapa, salada, cebola roxa, 120g de hambúrguer bovino, cheddar, barbecue'},
+  {name:'Onio Rings',price:22.99,desc:'Pão selado na chapa, salada, 100g de hambúrguer bovino, molho especial, cheddar, 2 fatias de bacon gratinada, cebola empanada'},
+  {name:'Moda da Casa',price:23.99,desc:'Pão celado na chapa, creme chease, salada, hambúrguer 120g, queijo cheddar, cebola com bacon caramelizado'},
+  {name:'Triplo X',price:28.99,desc:'Pão, 3 carnes artesanais 120g, queijo cheddar, bacon gratinado, salada'},
+  {name:'Tropical Burguer',price:24.99,desc:'Pão brioche selado na chapa, salada, 150g de hambúrguer bovino, queijo, bacon fatiado, abacaxi selado com melaço na chapa'},
+  {name:'Especial Burguer',price:22.99,desc:'Pão selado na chapa, salada, 150g de hambúrguer bovino, picles, bacon fatiado, cebola roxa, creme chease'},
+  {name:'Bacon Crock',price:22.99,desc:'Pão selado na chapa, 120g de hambúrguer bovina, molho da casa, salada, queijo mussarela, bacon fatiado, maionese de bacon'},
+  {name:'Snack Cheddar Duplo',price:25.99,desc:'Pão celado na chapa, salada, duplo hambúrguer smash 80g cada, cheddar, bacon, maionese de bacon'},
+];
+const tradicional = [
+  {name:'X-Tudo',price:17.99,desc:'Pão, hambúrguer, ovo, bacon, queijo, presunto, frango, salada, tomate, milho, batata palha'},
+  {name:'Misto Egg',price:9.99,desc:'Pão, ovo, queijo, presunto'},
+  {name:'X-Calabresa',price:17.99,desc:'Pão, hambúrguer, queijo, calabresa, salada, tomate, milho, batata palha'},
+  {name:'X-Bacon',price:14.99,desc:'Pão, hambúrguer, bacon, queijo, salada, tomate, milho, batata palha'},
+  {name:'X-Egg',price:14.99,desc:'Pão, hambúrguer, queijo, ovo, salada, tomate, milho, batata palha'},
+  {name:'X-Burguer',price:17.99,desc:'Pão, hambúrguer, queijo, presunto, salada, tomate, milho, batata palha'},
+  {name:'Hambúrguer',price:11.99,desc:'Pão, hambúrguer, salada, tomate, milho, batata palha'},
+  {name:'X-Egg Bacon',price:16.99,desc:'Pão, hambúrguer, queijo, ovo, bacon, salada, tomate, milho, batata palha'},
+  {name:'X-Salada',price:12.99,desc:'Pão, hambúrguer, queijo, salada, tomate, milho, batata palha'},
+  {name:'X-Frango',price:15.99,desc:'Pão, frango, hambúrguer, queijo, ovo, salada, tomate, milho, batata palha'},
+];
+const bebidas = [
+  {name:'Guaraná Lata',price:5.00,icon:'🥤'},{name:'Pepsi Lata',price:5.00,icon:'🥤'},
+  {name:'Coca-Cola Lata',price:6.00,icon:'🥤'},{name:'Pepsi 1L',price:9.00,icon:'🍾'},
+  {name:'Guaraná 1L',price:9.00,icon:'🍾'},{name:'Guaraná 2L',price:12.00,icon:'🍾'},
+  {name:'Pepsi 2L',price:12.00,icon:'🍾'},{name:'Coca-Cola 2L',price:13.00,icon:'🍾'},
+  {name:'Suco 500ml',price:6.00,icon:'🧃'},{name:'Suco 1L',price:12.00,icon:'🧃'},
+];
+const adicionais = [
+  {name:'Ovo',price:2.00},{name:'Carne Tradicional',price:4.00},{name:'Carne Artesanal 100g',price:5.50},
+  {name:'Banana',price:2.50},{name:'Cheddar',price:5.00},{name:'Queijo',price:3.00},
+  {name:'Presunto',price:2.50},{name:'Costela 120g',price:6.50},{name:'Carne Seca 100g',price:5.00},
+  {name:'Bacon',price:3.00},{name:'Calabresa',price:3.00},{name:'Frango',price:3.00},
+  {name:'Maionese Caseira',price:1.00},
+];
+
+let cart = [], tipoEntrega = 'delivery', pgto = 'dinheiro';
+
+const fmt = v => 'R$ ' + v.toFixed(2).replace('.',',');
+const esc = s => s.replace(/'/g,"\\'");
+
+function renderGrid(data, id){
+  document.getElementById(id).innerHTML = data.map(it=>`
+    <div class="card">
+      <div class="card-name">${it.name}</div>
+      <div class="card-desc">${it.desc}</div>
+      <div class="card-foot">
+        <span class="card-price">${fmt(it.price)}</span>
+        <button class="btn-add" onclick="add('${esc(it.name)}',${it.price})">+</button>
+      </div>
+    </div>`).join('');
+}
+function renderBebidas(){
+  document.getElementById('g-beb').innerHTML = bebidas.map(b=>`
+    <div class="drink-card">
+      <div class="drink-icon">${b.icon}</div>
+      <div class="drink-name">${b.name}</div>
+      <div class="drink-price">${fmt(b.price)}</div>
+      <button class="btn-drink" onclick="add('${esc(b.name)}',${b.price})">+ Adicionar</button>
+    </div>`).join('');
+}
+function renderAdic(){
+  document.getElementById('g-adic').innerHTML = adicionais.map(a=>`
+    <div class="add-card">
+      <div><div class="add-name">${a.name}</div><div class="add-price">${fmt(a.price)}</div></div>
+      <button class="btn-plus" onclick="add('+${esc(a.name)}',${a.price})">+</button>
+    </div>`).join('');
+}
+
+function add(name, price){
+  const ex = cart.find(i=>i.name===name);
+  if(ex) ex.qty++; else cart.push({name,price,qty:1});
+  update(); toast('✓ '+name.replace(/^\+/,''));
+}
+function dec(i){ if(cart[i].qty>1) cart[i].qty--; else cart.splice(i,1); update(); }
+function inc(i){ cart[i].qty++; update(); }
+const total = () => cart.reduce((s,i)=>s+i.price*i.qty,0);
+const count = () => cart.reduce((s,i)=>s+i.qty,0);
+
+function update(){
+  const t=total(), c=count();
+  document.getElementById('hBadge').textContent=c;
+  document.getElementById('dTotal').textContent=fmt(t);
+  document.getElementById('floatVal').textContent=fmt(t);
+  document.getElementById('floatCount').textContent=c;
+  document.getElementById('floatCart').classList.toggle('show',c>0);
+  renderCartBody();
+}
+function renderCartBody(){
+  const el=document.getElementById('cartBody');
+  if(!cart.length){el.innerHTML='<div class="empty-cart"><div class="empty-icon">🍔</div><p style="color:var(--gray);font-size:14px">Carrinho vazio.<br>Adicione um lanche!</p></div>';return;}
+  el.innerHTML=cart.map((it,i)=>`
+    <div class="ci">
+      <div class="ci-info"><div class="ci-name">${it.name}</div><div class="ci-price">${fmt(it.price*it.qty)}</div></div>
+      <div class="qty-ctrl">
+        <button class="qty-b" onclick="dec(${i})">−</button>
+        <span class="qty-n">${it.qty}</span>
+        <button class="qty-b" onclick="inc(${i})">+</button>
+      </div>
+    </div>`).join('');
+}
+
+function openCart(){
+  if(!cart.length){toast('Adicione itens primeiro!');return;}
+  document.getElementById('ov').classList.add('show');
+  document.getElementById('drawer').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeCart(){
+  document.getElementById('ov').classList.remove('show');
+  document.getElementById('drawer').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+function openAddr(){
+  if(!cart.length){toast('Carrinho vazio!');return;}
+  document.getElementById('sumTotal').textContent=fmt(total());
+  document.getElementById('sumItems').innerHTML=cart.map(it=>`
+    <div class="order-sum-item">
+      <span>${it.qty}x ${it.name}</span>
+      <span>${fmt(it.price*it.qty)}</span>
+    </div>`).join('');
+  closeCart();
+  document.getElementById('addrOv').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeAddr(){
+  document.getElementById('addrOv').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+function setTipo(t){
+  tipoEntrega=t;
+  document.getElementById('tDelivery').classList.toggle('sel',t==='delivery');
+  document.getElementById('tRetirada').classList.toggle('sel',t==='retirada');
+  document.getElementById('fieldsDelivery').style.display=t==='delivery'?'':'none';
+  document.getElementById('fieldRetirada').classList.toggle('show',t==='retirada');
+}
+function setPgto(p){
+  pgto=p;
+  document.getElementById('pDinheiro').classList.toggle('sel',p==='dinheiro');
+  document.getElementById('pPix').classList.toggle('sel',p==='pix');
+  document.getElementById('pCartao').classList.toggle('sel',p==='cartao');
+  document.getElementById('trocoWrap').classList.toggle('show',p==='dinheiro');
+}
+
+function sendWpp(){
+  const nome=document.getElementById('fNome').value.trim();
+  if(!nome){alert('Informe seu nome!');document.getElementById('fNome').focus();return;}
+  let endStr='';
+  if(tipoEntrega==='delivery'){
+    const rua=document.getElementById('fRua').value.trim();
+    const num=document.getElementById('fNum').value.trim();
+    const bairro=document.getElementById('fBairro').value.trim();
+    const cidade=document.getElementById('fCidade').value.trim();
+    if(!rua||!num||!bairro||!cidade){alert('Preencha o endereço completo!');return;}
+    const comp=document.getElementById('fComp').value.trim();
+    const ref=document.getElementById('fRef').value.trim();
+    endStr=`🏠 *Endereço de entrega:*\n${rua}, ${num}${comp?' — '+comp:''}\n${bairro} · ${cidade}${ref?'\n📌 Ref: '+ref:''}`;
+  } else {
+    endStr=`🏠 *Retirada no local*\nRua João Amaro Gomes, Nº 1332 · Tancredo Neves`;
+  }
+  const pgtoLabel={dinheiro:'💵 Dinheiro',pix:'📲 Pix',cartao:'💳 Cartão'}[pgto];
+  const troco=pgto==='dinheiro'?document.getElementById('fTroco').value.trim():'';
+  const obs=document.getElementById('fObs').value.trim();
+  const t=total();
+  let msg=`🍔 *PEDIDO — A Loja Burguer*\n`;
+  msg+=`━━━━━━━━━━━━━━━\n`;
+  msg+=`👤 *Cliente:* ${nome}\n\n`;
+  msg+=`🛒 *Itens:*\n`;
+  cart.forEach(it=>{ msg+=`  • ${it.qty}x ${it.name} — ${fmt(it.price*it.qty)}\n`; });
+  msg+=`\n💰 *TOTAL: ${fmt(t)}*\n`;
+  msg+=`━━━━━━━━━━━━━━━\n`;
+  msg+=`${endStr}\n`;
+  msg+=`\n💳 *Pagamento:* ${pgtoLabel}`;
+  if(troco) msg+=`\n💵 *Troco para:* ${troco}`;
+  if(obs) msg+=`\n\n📝 *Obs:* ${obs}`;
+  msg+=`\n━━━━━━━━━━━━━━━\n✅ Aguardando confirmação!`;
+  window.open('https://wa.me/5573998353325?text='+encodeURIComponent(msg),'_blank');
+}
+
+function goTab(id, btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+let toastT;
+function toast(msg){
+  const el=document.querySelector('.toast'); if(el) el.remove(); clearTimeout(toastT);
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); toastT=setTimeout(()=>t.remove(),2000);
+}
+
+renderGrid(artesanal,'g-art');
+renderGrid(tradicional,'g-trad');
+renderBebidas();
+renderAdic();
+</script>
+</body>
+</html>
